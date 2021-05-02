@@ -11,7 +11,10 @@ int moving, startx, starty;
 GLfloat angle = 0.0;   /* in degrees */
 GLfloat angle2 = 0.0;   /* in degrees */
 
-
+static GLfloat z_eye = 10.0; // z coordinate to zoom in or out
+static GLfloat x_eye = 0.0; 
+static GLfloat y_eye = 0.0; 
+static GLfloat rotation_angle = 0;
 void init(void)
 {
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -22,6 +25,10 @@ void display(void)
 {
     //shoulder & elbow
     glClear(GL_COLOR_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(x_eye, y_eye, z_eye, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    glRotatef(rotation_angle, 1.0, 0.0, 0.0);
     glPushMatrix();
 
     glRotatef(angle2, 1.0, 0.0, 0.0);
@@ -140,8 +147,7 @@ void reshape(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(85.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    
     glTranslatef(0.0, 0.0, -5.0);
 }
 
@@ -150,6 +156,26 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
+    case '6': /* rotate around x-axis up */
+        rotation_angle += 10;
+        if (rotation_angle >= 90) rotation_angle = 90;
+        glutPostRedisplay(); break;
+
+    case '^': /* rotate around x-axis down */
+        rotation_angle -= 10;
+        if (rotation_angle <= -90) rotation_angle = -90;
+        glutPostRedisplay(); break;
+
+    case 'z': /* zoom out */
+        z_eye += 0.5;
+        if (z_eye >= 10) z_eye = 10;
+        glutPostRedisplay(); break;
+
+    case 'Z': /* zoom in */
+        z_eye -= 0.5;
+        if (z_eye <= 0) z_eye = 0.5;
+        glutPostRedisplay(); break;
+
     case 's':
         shoulder1_y = (shoulder1_y + 5) % 90;
         shoulder2_y = (shoulder2_y - 5) % 90;
